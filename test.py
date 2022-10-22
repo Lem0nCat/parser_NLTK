@@ -1,3 +1,4 @@
+from lib2to3.pgen2 import grammar
 from traceback import print_tb
 import nltk
 from nltk import CFG
@@ -55,19 +56,31 @@ def preprocessText(text):
     return tokens
 
 
+# grammar = CFG.fromstring("""
+#  S -> NP VP
+#  PP -> P NP
+#  NP -> Det N | Det N PP | 'я' | 'никита'
+#  VP -> V NP | VP PP
+#  Det -> 'мой'
+#  N -> 'слон' | 'обочина'
+#  V -> 'стрелять'
+#  P -> 'в' | 'на'
+# """)
+
 grammar = CFG.fromstring("""
- S -> NP VP
- PP -> P NP
- NP -> Det N | Det N PP | 'я' | 'никита'
- VP -> V NP | VP PP
- Det -> 'мой'
- N -> 'слон' | 'обочина'
- V -> 'стрелять'
- P -> 'в' | 'на'
+    S -> NP VP
+    PP -> P NP
+    NP -> Det N | Det N PP | Adj N | 'я' | 'никита'
+    VP -> V NP | VP PP | VP NP
+    Det -> 'мой'
+    N -> 'слон' | 'обочина'  | 'друг' | 'письмо' 
+    Adj -> 'сильный' | 'старый'
+    V -> 'стрелять' | 'писать'
+    P -> 'в' | 'на'
 """)
 
-#text = input("Введите текст: ")
-text = "Никита стрелял в слона на обочине"
+text = input("Введите текст: ")
+# text = "Никита стрелял в слона на обочине"
 
 tokens = preprocessText(text)
 print(tokens)
