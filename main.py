@@ -76,4 +76,5 @@ for tree in trees:
     print(tree)
 
 wfst0 = initWfst(tokens, grammar)
+wfst1 = complete_wfst(wfst0, tokens, grammar)
 display(wfst0, tokens)
