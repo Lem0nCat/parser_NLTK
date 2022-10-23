@@ -1,17 +1,24 @@
-from lib2to3.pgen2 import grammar
-from traceback import print_tb
 import nltk
 from nltk import CFG
-from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 from string import punctuation
 from pymystem3 import Mystem
-from nltk.stem import SnowballStemmer
+# from nltk.stem import SnowballStemmer
+ 
 
+grammar = CFG.fromstring("""
+    S -> NP VP
+    NP -> Adj N | N | 'я'
+    VP -> V NP | VP NP
+    N -> 'письмо' | 'друг'
+    V -> 'писать'
+    Adj -> 'старый'
+""")
 
 russian_stopwords = stopwords.words("russian")
-snowball = SnowballStemmer(language="russian")
 mystem = Mystem() 
+
+# snowball = SnowballStemmer(language="russian")
 
 
 def initWfst(tokens, grammar):
@@ -56,42 +63,17 @@ def preprocessText(text):
     return tokens
 
 
-# grammar = CFG.fromstring("""
-#  S -> NP VP
-#  PP -> P NP
-#  NP -> Det N | Det N PP | 'я' | 'никита'
-#  VP -> V NP | VP PP
-#  Det -> 'мой'
-#  N -> 'слон' | 'обочина'
-#  V -> 'стрелять'
-#  P -> 'в' | 'на'
-# """)
-
-grammar = CFG.fromstring("""
-    S -> NP VP
-    PP -> P NP
-    NP -> Det N | Det N PP | Adj N | 'я' | 'никита'
-    VP -> V NP | VP PP | VP NP
-    Det -> 'мой'
-    N -> 'слон' | 'обочина'  | 'друг' | 'письмо' 
-    Adj -> 'сильный' | 'старый'
-    V -> 'стрелять' | 'писать'
-    P -> 'в' | 'на'
-""")
-
 text = input("Введите текст: ")
-# text = "Никита стрелял в слона на обочине"
 
 tokens = preprocessText(text)
-print(tokens)
 
+# pos_tagged_text = nltk.pos_tag(tokens, lang='rus')
+# print(pos_tagged_text)
 
-sr_parser = nltk.ShiftReduceParser(grammar)
-for tree in sr_parser.parse(tokens):
+parser = nltk.ChartParser(grammar,trace=1)
+trees = parser.parse(tokens)
+for tree in trees:
     print(tree)
 
 wfst0 = initWfst(tokens, grammar)
-wfst1 = complete_wfst(wfst0, tokens, grammar)
-display(wfst1, tokens)
-
-
+display(wfst0, tokens)
